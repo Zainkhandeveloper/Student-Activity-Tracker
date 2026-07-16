@@ -666,9 +666,6 @@
       }
     });
 
-    // Belt-and-braces: make sure the latest state is flushed on exit.
-    window.addEventListener("beforeunload", () => Storage.save(State.tasks));
-
     // Initial overdue notification.
     notifyOverdue();
   }
