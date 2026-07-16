@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Task Manager</title>
+    <meta
+      name="description"
+      content="A simple, fast task manager for students to organize university work."
+    />
+
+    <!-- Preconnect speeds up the Google Fonts request -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Lets keyboard users jump straight past the header -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- ================= HEADER ================= -->
+    <header class="app-header">
+      <div class="container app-header__inner">
+        <div class="app-header__title">
+          <h1>
+            <span class="app-header__mark" aria-hidden="true">◆</span> Student
+            Task Manager
+          </h1>
+          <p class="app-header__subtitle">
+            Organize your university tasks efficiently
+          </p>
+        </div>
+
+        <div class="datetime" aria-label="Current date and time">
+          <div class="datetime__item">
+            <span class="datetime__label">Date</span>
+            <p id="currentDate" class="datetime__value"></p>
+          </div>
+          <div class="datetime__item">
+            <span class="datetime__label">Time</span>
+            <p id="currentTime" class="datetime__value" aria-live="off"></p>
+          </div>
+        </div>
+
+        <!-- Theme toggle (Dark/Light Mode) -->
+        <div class="theme-toggle" aria-label="Theme settings">
+          <button
+            type="button"
+            id="themeToggleBtn"
+            class="btn btn-icon"
+            aria-pressed="false"
+          >
+            <span aria-hidden="true" id="themeToggleIcon">🌙</span>
+            <span class="btn-label" id="themeToggleLabel">Dark mode</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ================= MAIN ================= -->
+    <main id="main-content" class="container">
+      <!-- Add Task -->
+      <section class="card" aria-labelledby="add-task-heading">
+        <h2 id="add-task-heading">Add a task</h2>
+
+        <form id="taskForm" class="task-form" novalidate>
+          <div class="field">
+            <label for="taskInput" class="sr-only">Task description</label>
+            <input
+              type="text"
+              id="taskInput"
+              name="task"
+              placeholder="e.g. Finish assignment 2 draft"
+              maxlength="100"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="field" style="min-width: 160px">
+            <label for="priorityInput" class="sr-only">Task priority</label>
+            <select
+              id="priorityInput"
+              name="priority"
+              class="priority-select"
+              aria-label="Task priority"
+            >
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+
+          <div class="field" style="min-width: 185px">
+            <label for="dueDateInput" class="sr-only">Due date</label>
+            <input
+              type="date"
+              id="dueDateInput"
+              name="dueDate"
+              class="due-date-input"
+              aria-label="Due date"
+            />
+          </div>
+
+          <button type="submit" id="addTaskBtn" class="btn btn-primary">
+            <span aria-hidden="true">＋</span> Add task
+          </button>
+        </form>
+
+        <p
+          id="message"
+          class="form-message"
+          role="status"
+          aria-live="polite"
+        ></p>
+        <p
+          id="overdueNotice"
+          class="form-message"
+          role="status"
+          aria-live="polite"
+          data-tone="error"
+        ></p>
+      </section>
+
+      <!-- Search + Filter -->
+      <section class="card" aria-labelledby="find-tasks-heading">
+        <h2 id="find-tasks-heading">Find tasks</h2>
+
+        <div class="field field--search">
+          <label for="searchInput" class="sr-only">Search tasks</label>
+          <span class="field__icon" aria-hidden="true">🔍</span>
+          <input
+            type="search"
+            id="searchInput"
+            placeholder="Search tasks…"
+            autocomplete="off"
+          />
+        </div>
+
+        <div
+          class="filter-group"
+          role="group"
+          aria-label="Filter tasks by status"
+        >
+          <button
+            type="button"
+            class="filter-btn is-active"
+            data-filter="all"
+            aria-pressed="true"
+          >
+            All
+          </button>
+          <button
+            type="button"
+            class="filter-btn"
+            data-filter="pending"
+            aria-pressed="false"
+          >
+            Pending
+          </button>
+          <button
+            type="button"
+            class="filter-btn"
+            data-filter="completed"
+            aria-pressed="false"
+          >
+            Completed
+          </button>
+        </div>
+
+        <!-- Sort controls -->
+        <div class="sort-group" role="group" aria-label="Sort tasks">
+          <span class="sort-group__label">Sort:</span>
+          <button
+            type="button"
+            class="sort-btn is-active"
+            data-sort="dueDate"
+            aria-pressed="true"
+          >
+            Date
+          </button>
+          <button
+            type="button"
+            class="sort-btn"
+            data-sort="text"
+            aria-pressed="false"
+          >
+            A-Z
+          </button>
+          <button
+            type="button"
+            class="sort-btn"
+            data-sort="priority"
+            aria-pressed="false"
+          >
+            Priority
+          </button>
+        </div>
+      </section>
+
+      <!-- Statistics -->
+
+      <section class="stats" aria-labelledby="stats-heading">
+        <h2 id="stats-heading" class="sr-only">Task statistics</h2>
+
+        <div class="stat-card stat-card--ring">
+          <svg
+            class="progress-ring"
+            viewBox="0 0 120 120"
+            width="96"
+            height="96"
+            role="img"
+            aria-label="Overall completion progress"
+          >
+            <circle class="progress-ring__track" cx="60" cy="60" r="54" />
+            <circle
+              class="progress-ring__value"
+              id="progressRingCircle"
+              cx="60"
+              cy="60"
+              r="54"
+            />
+          </svg>
+          <p class="progress-ring__label">
+            <span id="progressPercentage">0</span>%
+          </p>
+          <h3>Completion</h3>
+        </div>
+
+        <div class="stat-card">
+          <p id="totalTasks" class="stat-card__value">0</p>
+          <h3>Total tasks</h3>
+        </div>
+
+        <div class="stat-card">
+          <p id="pendingTasks" class="stat-card__value">0</p>
+          <h3>Pending</h3>
+        </div>
+
+        <div class="stat-card">
+          <p id="completedTasks" class="stat-card__value">0</p>
+          <h3>Completed</h3>
+        </div>
+      </section>
+
+      <!-- Task List -->
+      <section class="card" aria-labelledby="task-list-heading">
+        <div class="task-list-header">
+          <h2 id="task-list-heading">Your tasks</h2>
+          <button type="button" id="clearAllBtn" class="btn btn-danger-outline">
+            <span aria-hidden="true">🗑</span> Clear all
+          </button>
+        </div>
+
+        <ul id="taskList" class="task-list" role="list" aria-live="polite"></ul>
+      </section>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="app-footer">
+      <p>
+        Student Task Manager &middot; Software Construction &amp; Development
+        Assignment
+      </p>
+    </footer>
+
+    <!-- Reusable <template> for a task row: keeps markup out of JS strings -->
+    <template id="taskItemTemplate">
+      <li class="task-item" role="listitem">
+        <div class="task-main">
+          <input type="checkbox" class="task-checkbox" />
+          <label class="task-checkbox-label sr-only"></label>
+
+          <span class="task-text"></span>
+
+          <span class="task-badges" aria-hidden="true">
+            <span class="task-priority-badge"></span>
+            <span class="task-due-date"></span>
+            <span class="task-overdue-badge hidden">Overdue</span>
+          </span>
+          <span class="task-due-sr sr-only"></span>
+
+          <div class="task-hidden-edit-meta hidden" aria-hidden="true">
+            <span class="meta-priority"></span>
+            <span class="meta-dueDate"></span>
+          </div>
+
+          <input
+            type="text"
+            class="task-edit-input hidden"
+            maxlength="100"
+            aria-label="Edit task text"
+          />
+        </div>
+
+        <div class="task-actions" data-view="display">
+          <button type="button" class="btn btn-icon edit-btn">
+            <span aria-hidden="true">✏️</span
+            ><span class="btn-label">Edit</span>
+          </button>
+          <button type="button" class="btn btn-icon delete-btn">
+            <span aria-hidden="true">🗑️</span
+            ><span class="btn-label">Delete</span>
+          </button>
+        </div>
+
+        <div class="task-actions hidden" data-view="edit">
+          <button type="button" class="btn btn-icon save-btn">
+            <span aria-hidden="true">💾</span
+            ><span class="btn-label">Save</span>
+          </button>
+          <button type="button" class="btn btn-icon cancel-btn">
+            <span aria-hidden="true">✖️</span
+            ><span class="btn-label">Cancel</span>
+          </button>
+        </div>
+      </li>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
