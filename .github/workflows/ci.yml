@@ -32,7 +32,13 @@ jobs:
         run: sleep 3
 
       - name: Run Playwright tests
-        run: npx playwright test
+        run: npx playwright test --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: results.json
+
+      - name: AI Deployment Optimization Analysis
+        if: always()
+        run: node scripts/deploy-check.js
 
       - name: Upload test report
         if: always()
