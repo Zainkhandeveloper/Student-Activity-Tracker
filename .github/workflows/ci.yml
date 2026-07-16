@@ -40,6 +40,10 @@ jobs:
         if: always()
         run: node scripts/deploy-check.js
 
+      - name: "AI Monitoring and Log Analysis"
+        if: always()
+        run: node scripts/monitor-check.js
+
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v4
